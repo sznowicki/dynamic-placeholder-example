@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dynamic CSS placeholder example</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <main>
+        <div class="card">
+            <div class="headline">
+                <h2>Card with a placeholder</h2>
+            </div>
+            <div class="content">
+                <div id="result" class="wrapper placeholder" style="--expected-lines: 3;"></div>
+            </div>
+            <nav>
+                <label>
+                    Expected lines:
+                    <input type="number" value="3" id="lines">
+                </label>
+                <button type="button" id="toggle">Toggle content</button>
+                <button type="button" id="showBoth">Show both</button>
+            </nav>
+        </div>
+    </main>
+    <script>
+        function main() {
+            const toggleButton = document.getElementById('toggle');
+            const showBothButton = document.getElementById('showBoth');
+            const result = document.getElementById('result');
+            let currentState = 'placeholder';
+
+            const injectContent = () => {
+                debugger;
+                const expectedLines = parseInt(getComputedStyle(result).getPropertyValue('--expected-lines').trim(), 10);
+                result.innerHTML = new Array(expectedLines)
+                    .fill('Line')
+                    .map((el, key) => `${el} ${key + 1}`)
+                    .join('<br/>');
+            };
+
+            const emptyContent = () => {
+                result.innerHTML = '';
+            };
+
+
+            const render = (mode = currentState) => {
+                switch (mode) {
+                    case 'placeholder':
+                        currentState = 'placeholder';
+                        emptyContent();
+                        result.classList.add('placeholder');
+
+                        break;
+                    case 'both':
+                        currentState = 'placeholder';
+                        injectContent();
+                        break;
+                    default:
+                        currentState = 'result';
+                        injectContent();
+                        result.classList.remove('placeholder');
+                }
+            };
+
+            toggleButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                result.classList.remove('both');
+                render(currentState === 'placeholder' ? 'content' : 'placeholder');
+            });
+            showBothButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                result.classList.add('both', 'placeholder');
+                injectContent();
+            });
+
+            lines.addEventListener('change', (e) => {
+                e.preventDefault();
+                const newValue = parseInt(e.target.value, 10);
+                result.style = `--expected-lines: ${newValue};`;
+                render();
+            });
+        }
+        main();
+    </script>
+</body>
+</html>
